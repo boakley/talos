@@ -15,7 +15,7 @@ from django.db import models
 
 # Create your models here.
 class Project(models.Model):
-    root = models.CharField(max_length=1024)
+    root = models.CharField(max_length=2048, unique=True)
 #    objects = ProjectManager()
 
     def __unicode__(self):
