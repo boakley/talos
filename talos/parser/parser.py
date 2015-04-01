@@ -28,27 +28,6 @@ from testcase import Testcase
 from rfkeyword import Keyword
 from common import Row, Statement
 
-def RobotFactory(path, parent=None):
-    '''Return an instance of SuiteFile, ResourceFile, or SuiteFolder
-
-    Exactly which is returned depends on the contents of the
-    file. If there is a testcase table, this will return an
-    instance of SuiteFile, otherwise it will return an
-    instance of ResourceFile.
-    '''
-    if os.path.isdir(path):
-        rf = SuiteFolder(path, parent)
-    else:
-        rf = RobotFile(path, parent)
-
-        for table in rf.tables:
-            if isinstance(table, TestcaseTable):
-                rf.__class__ = SuiteFile
-                return rf
-
-            rf.__class__ = ResourceFile
-    return rf
-    
 class SuiteFolder(object):
     def __init__(self, path, parent=None):
         self.parent = parent
@@ -74,7 +53,7 @@ class SuiteFolder(object):
                         self.children.append(SuiteFolder(fullpath, parent=self))
                 else:
                     if (ext in (".xml", ".robot", ".txt", ".py", ".tsv")):
-                        rf = RobotFactory(fullpath, parent=self)
+                        rf = RobotFile.factory(fullpath, parent=self)
                         self.children.append(rf)
 
             except Exception, e:
@@ -95,6 +74,28 @@ class RobotFile(object):
       trailing spaces
 
     '''
+    @classmethod
+    def factory(cls, path, parent=None):
+        '''Return an instance of SuiteFile, ResourceFile, or SuiteFolder
+
+        Exactly which is returned depends on the contents of the
+        file. If there is a testcase table, this will return an
+        instance of SuiteFile, otherwise it will return an
+        instance of ResourceFile.
+        '''
+        if os.path.isdir(path):
+            rf = SuiteFolder(path, parent)
+        else:
+            rf = SuiteFile(path, parent)
+
+            for table in rf.tables:
+                if isinstance(table, TestcaseTable):
+                    rf.__class__ = SuiteFile
+                    return rf
+
+                rf.__class__ = ResourceFile
+        return rf
+
     def __init__(self, path, parent=None):
         self.parent = parent
         self.name = os.path.splitext(os.path.basename(path))[0]
