@@ -1,7 +1,9 @@
 from common import Statement
 
+
 class RobotTable(object):
     '''A table made up of zero or more rows'''
+
     def __init__(self, parent, linenumber=0, name=None):
         self.linenumber = linenumber
         self.name = name
