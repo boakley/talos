@@ -1,22 +1,10 @@
 from django.db import models
 
 
-# I don't remember where I was going with the ProjectManager class...
-# 
-# class ProjectManager(models.Manager):
-#     '''
-#     '''
-#     def create_project(self, path):
-#         project = self.create(root=path)
-
-#         # <this is where we would populate the db>
-
-#         return project
-
-# Create your models here.
+# The more I think about it, the more useless this class becomes.
+# Does this app really need to track projects?
 class Project(models.Model):
-    root = models.CharField(max_length=2048, unique=True)
-#    objects = ProjectManager()
+    root = models.CharField(max_length=2048, unique=True, null=False)
 
     def __unicode__(self):
         return self.root
@@ -25,8 +13,8 @@ class Collection(models.Model):
     '''
     A collection of keywords (eg: a resource file or library)
     '''
-    project = models.ForeignKey(Project, null=True)
-    path = models.CharField(max_length=2048, null=True)
+
+    path = models.CharField(max_length=2048, null=False, unique=True)
     name = models.CharField(max_length=256)
     collection_type = models.CharField(max_length=8, 
                                        choices=(
@@ -35,20 +23,28 @@ class Collection(models.Model):
                                            ("suite", "Test suite"),
                                        ),
     )
-    version = models.CharField(max_length=12, blank=True)
-    scope = models.CharField(max_length=6, 
-                             choices=(("global", "Global"),
-                                      ("suite", "Test suite"),
-                                      ("test", "Test case")),
-                             default="global")
-    namedargs = models.CharField(blank=True, max_length=2048)
+    doc = models.TextField(blank=True)
     doc_format = models.CharField(max_length=10, 
                                   choices=(("HTML", "HTML"),
                                            ("TEXT", "Plain text"),
                                            ("ROBOT", "Robot"),
                                            ("reST", "reStructured Text")),
                                   default="ROBOT")
-    doc = models.TextField(blank=True)
+
+    # these three only apply to libraries, not resource files
+    # or test suites. Should I use a separate model for libraries,
+    # resource files and so on? I guess this is good enough for now.
+    version = models.CharField(max_length=12, blank=True)
+    scope = models.CharField(max_length=6, 
+                             choices=(("global", "Global"),
+                                      ("suite", "Test suite"),
+                                      ("test", "Test case"),
+                                      ("", "none")),
+                             default="global")
+    namedargs = models.CharField(blank=True, max_length=2048)
+
+    def keywords(self):
+        return Keyword.objects.filter(collection=self)
 
     def __unicode__(self):
         if self.path is None:
