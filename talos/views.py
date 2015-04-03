@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from rest_framework import viewsets
 from talos.models import Project, Collection, Testcase, Keyword
-from talos.serializers import ProjectSerializer, CollectionSerializer
+from talos.serializers import ProjectSerializer, CollectionSerializer, KeywordSerializer
 
 
 class ProjectViewSet(viewsets.ModelViewSet):
@@ -12,3 +12,6 @@ class CollectionViewSet(viewsets.ModelViewSet):
     queryset = Collection.objects.all()
     serializer_class = CollectionSerializer
 
+class KeywordViewSet(viewsets.ModelViewSet):
+    queryset = Keyword.objects.all()
+    serializer_class = KeywordSerializer
