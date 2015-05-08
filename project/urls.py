@@ -5,8 +5,10 @@ from django.contrib import admin
 
 router = routers.DefaultRouter()
 router.register(r'projects', views.ProjectViewSet)
-router.register(r'collections', views.CollectionViewSet)
+router.register(r'libraries', views.LibraryFileViewSet)
+router.register(r'resource_files', views.ResourceFileViewSet)
 router.register(r'keywords', views.KeywordViewSet)
+router.register(r'testcases', views.TestcaseViewSet)
 
 urlpatterns = [
     url(r'^api/', include(router.urls)),
