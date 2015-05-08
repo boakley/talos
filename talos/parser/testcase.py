@@ -29,6 +29,19 @@ class Testcase(object):
         # have to have this logic 
         return self.parent.path
 
+    def get_setting(self, name, default=""):
+        for setting in self.settings:
+            # hmmm; the setting contains empty cells; is it safe to 
+            # assume the setting name is _always_ the second cell?
+            # Probably, but _literally_?
+            
+            # N.B. the setting will be surrounded by square brackets,
+            # which is why we excluded them from the comparison
+            if setting[1].lower()[1:-1] == name.lower():
+                return setting[2:]
+
+        return default
+
     @property
     def settings(self):
         '''Return a list of settings (statements with cell[1] matching \[.*?\])
