@@ -28,6 +28,7 @@ from testcase import Testcase
 from rfkeyword import Keyword
 from common import Row, Statement
 
+
 class SuiteFolder(object):
     def __init__(self, path, parent=None):
         self.parent = parent
@@ -39,6 +40,17 @@ class SuiteFolder(object):
         
     def __repr__(self):
         return "<SuiteFolder(%s)>" % self.path
+
+    def walk(self):
+        '''Generator which traverses the tree of child objects
+        
+        This will return a list of SuiteFolder, SuiteFile and ResourceFile objects
+        '''
+        for child in self.children:
+            yield child
+            if isinstance(child, SuiteFolder):
+                for grandchild in child.traverse():
+                    yield grandchild
 
     def _add_folder(self, path, parent=None):
         for filename in os.listdir(path):
@@ -83,6 +95,10 @@ class RobotFile(object):
         instance of SuiteFile, otherwise it will return an
         instance of ResourceFile.
         '''
+        basename = os.path.basename(path)
+        if (re.search(r'__init__.(txt|robot|html|tsv)$', basename)):
+            return None
+
         if os.path.isdir(path):
             rf = SuiteFolder(path, parent)
         else:
@@ -184,6 +200,15 @@ class RobotFile(object):
         return "<RobotFile(%s)>" % self.path
 
     @property
+    def settings(self):
+        settings = {}
+        for table in self.tables:
+            if isinstance(table, SettingTable):
+                for statement in table.statements:
+                    settings[statement[0].lower()] = statement[1:]
+        return settings
+                
+    @property
     def type(self):
         '''Return 'suite' or 'resource' or None
         
@@ -195,7 +220,7 @@ class RobotFile(object):
         robot_tables = [table for table in self.tables if not isinstance(table, UnknownTable)]
         if len(robot_tables) == 0:
             # no robot tables were found
-            return None
+            return "resource"
 
         for table in self.tables:
             if isinstance(table, TestcaseTable):
