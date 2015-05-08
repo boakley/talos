@@ -1,0 +1,32 @@
+{% extends "admin/base.html" %}
+
+{% block title %}{{ title }} | {{ site_title|default:_('Talos site admin') }}{% endblock %}
+
+{% block branding %}
+<!-- <h1 id="site-name"><a href="{% url 'admin:index' %}">{{ site_header|default:_('Talos administration') }}</a></h1> -->
+<h1 id="site-name"><a href="{% url 'admin:index' %}">Talos administration</a></h1>
+{% endblock %}
+
+{% block extrastyle %}
+<style>
+    #header { 
+        background-color: #333940; 
+        border-bottom: solid 3px #b22222; 
+    }
+
+    #branding h1, #branding h1 a:link, #branding h1 a:visited {
+        color: #aaaaaa;
+    }
+    #branding h1 a:hover {
+        color: #ffffff;
+    }
+    .module h2, .module caption, .inline-group h2 { 
+        background:#ccc url(/admin_media/img/admin/nav-bg.gif) bottom left repeat-x; 
+    }
+    a.section:link, a.section:visited { 
+        color: #666666; 
+    }
+</style>
+{% endblock %}
+
+{% block nav-global %}{% endblock %}
