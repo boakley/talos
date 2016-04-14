@@ -22,8 +22,6 @@ SECRET_KEY = 'spb8x&&6ag9!&c@&8yo)(i7^k+06409pd0_ea1vb^*ncbh0&86'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-TEMPLATE_DEBUG = True
-
 ALLOWED_HOSTS = []
 
 
