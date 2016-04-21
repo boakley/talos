@@ -9,6 +9,7 @@ router.register(r'libraries', views.LibraryFileViewSet)
 router.register(r'resource_files', views.ResourceFileViewSet)
 router.register(r'keywords', views.KeywordViewSet)
 router.register(r'testcases', views.TestcaseViewSet)
+router.register(r'suitefiles', views.SuiteFileViewSet)
 
 urlpatterns = [
     url(r'^api/', include(router.urls)),

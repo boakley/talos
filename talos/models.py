@@ -1,6 +1,5 @@
 from django.db import models
 
-# see http://stackoverflow.com/questions/20895429/how-exactly-do-django-content-types-work
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericRelation, GenericForeignKey
 
@@ -47,9 +46,9 @@ class SuiteFile(models.Model):
                                   default="ROBOT")
 
     keywords = GenericRelation('Keyword')
-
-    def testcases(self):
-        return Testcase.objects.filter(parent=self)
+    testcases = GenericRelation('Testcase')
+#    def testcases(self):
+#        return Testcase.objects.filter(parent=self)
 
     def __unicode__(self):
         if self.path is None:
@@ -88,21 +87,24 @@ class LibraryFile(models.Model):
 
 
 class Testcase(models.Model):
-    parent = models.ForeignKey(SuiteFile)
     name = models.CharField(max_length=MAX_NAME_LENGTH)
     doc = models.TextField("Documentation", blank=True)
-
-    def __unicode__(self):
-        return self.name
-    
-class Keyword(models.Model):
-    name = models.CharField(max_length=MAX_NAME_LENGTH)
-    doc = models.TextField("Documentation", blank=True)
-    args = models.CharField(max_length=256) 
 
     content_type = models.ForeignKey(ContentType)
     object_id = models.PositiveIntegerField()
-    content_object = GenericForeignKey('content_type', 'object_id')
+    parent = GenericForeignKey('content_type', 'object_id')
+
+    def __unicode__(self):
+        return self.name
+
+class Keyword(models.Model):
+    name = models.CharField(max_length=MAX_NAME_LENGTH)
+    doc = models.TextField("Documentation", blank=True)
+    args = models.CharField(max_length=256)
+
+    content_type = models.ForeignKey(ContentType)
+    object_id = models.PositiveIntegerField()
+    parent = GenericForeignKey('content_type', 'object_id')
 
     def __unicode__(self):
         return self.name

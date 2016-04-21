@@ -86,6 +86,9 @@ class RobotFile(object):
       trailing spaces
 
     '''
+    TYPE_RESOURCE = "resource"
+    TYPE_SUITE = "suite"
+
     @classmethod
     def factory(cls, path, parent=None):
         '''Return an instance of SuiteFile, ResourceFile, or SuiteFolder
@@ -207,26 +210,26 @@ class RobotFile(object):
                 for statement in table.statements:
                     settings[statement[0].lower()] = statement[1:]
         return settings
-                
+
     @property
     def type(self):
         '''Return 'suite' or 'resource' or None
-        
+ 
         This will return 'suite' if a testcase table is found;
         It will return 'resource' if at least one robot table
         is found. If no tables are found it will return None
         '''
-        
+
         robot_tables = [table for table in self.tables if not isinstance(table, UnknownTable)]
         if len(robot_tables) == 0:
             # no robot tables were found
-            return "resource"
+            return self.TYPE_RESOURCE
 
         for table in self.tables:
             if isinstance(table, TestcaseTable):
-                return "suite"
+                return self.TYPE_SUITE
 
-        return "resource"
+        return self.TYPE_RESOURCE
 
     @property
     def keywords(self):
@@ -243,13 +246,13 @@ class RobotFile(object):
             if isinstance(table, TestcaseTable):
                 for testcase in table.testcases:
                     yield testcase
-        
+
     def dump(self):
         '''Regurgitate the tables and rows'''
         for table in self.tables:
             print "*** %s ***" % table.name
             table.dump()
-                
+
 
 def TableFactory(parent, linenumber, name):
     match = Matcher(re.IGNORECASE)

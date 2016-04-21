@@ -34,23 +34,27 @@ class Command(BaseCommand):
                             continue
 
                         # FIXME: need to add support for library files (.py and .xml ...)
-                        if robot_file.type == "resource":
+                        if robot_file.type == RobotFile.TYPE_RESOURCE:
                             collection, created = models.ResourceFile.objects.get_or_create(path=fullpath)
 
-                        elif robot_file.type == "suite":
+                        elif robot_file.type == RobotFile.TYPE_SUITE:
                             collection, created = models.SuiteFile.objects.get_or_create(path=fullpath)
 
                         if not created:
                             # out with the old, in with the new!
                             collection.keywords.all().delete()
-                            
+
                         collection.name = robot_file.name
                         collection.doc = robot_file.settings.get("documentation", "")
                         collection.save()
-                        
+
                         with transaction.atomic():
                             for keyword in robot_file.keywords:
                                 doc = "\n".join(keyword.get_setting("documentation", []))
                                 args = ", ".join(keyword.get_setting("arguments"))
                                 kw, created = collection.keywords.get_or_create(name=keyword.name, doc=doc, args=args)
                                 kw.save()
+
+                            for testcase in robot_file.testcases:
+                                doc = "\n".join(keyword.get_setting("documentation", []))
+                                tc, created = collection.testcases.get_or_create(name=testcase.name, doc=doc)
